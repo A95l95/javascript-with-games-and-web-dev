@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+       body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+    canvas{
+        border-radius: 7px;
+    }  
+    </style>
+</head>
+<body>
+    <canvas id="myCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById("myCanvas");
+       canvas.width = window.innerWidth-100;
+        canvas.height = window.innerHeight-100;
+        const ctx = canvas.getContext('2d');
+
+        class Body {
+            constructor(x, y, w, h, color) {
+                this.x = x;
+                this.y = y;
+                this.w = w;
+                this.h = h;
+                this.color = color;
+                this.vx = 0; // Initialize horizontal velocity
+                this.vy = 0; // Initialize vertical velocity
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.fillRect(this.x, this.y, this.w, this.h);
+            }
+        }
+
+        class Food {
+            constructor(x, y, radius, color) {
+                this.x = x;
+                this.y = y;
+                this.radius = radius;
+                this.color = color;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.fillStyle = this.color;
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+                ctx.fill();
+            }
+        }
+
+        let score = 0;
+        const body = [];
+        const food = new Food(Math.random() * (canvas.width - 50) + 25, Math.random() * (canvas.height - 50) + 25, 7, "red");
+
+        body.push(new Body(50, 50, 20, 20, "lime")); // Change the starting position of the snake
+
+        function collision() {
+            const dx = body[0].x + body[0].w / 2 - (food.x + food.radius);
+            const dy = body[0].y + body[0].h / 2 - (food.y + food.radius);
+            const totalDis = Math.sqrt(dx ** 2 + dy ** 2);
+            const totalRad = body[0].w / 2 + food.radius;
+            if (totalDis < totalRad) {
+                console.log("eat");
+                // Generate new food position
+                food.x = Math.random() * (canvas.width - 50) + 25; // Preventing food from going out of bounds
+                food.y = Math.random() * (canvas.height - 50) + 25; // Preventing food from going out of bounds
+
+                // Add new segment
+                const newSegment = new Body(body[body.length - 1].x, body[body.length - 1].y, 20, 20, "lime");
+                body.push(newSegment);
+                score += 10;
+            }
+        }
+
+        function updateSnake() {
+            for (let i = body.length - 1; i > 0; i--) {
+                body[i].x = body[i - 1].x;
+                body[i].y = body[i - 1].y;
+            }
+            body[0].x += body[0].vx;
+            body[0].y += body[0].vy;
+
+          
+        }
+
+        function animate() {
+            ctx.fillStyle = `rgba(0,0,0,0.3)`;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            setTimeout(function(){
+                updateSnake();
+                },4000);
+           
+            collision();
+            food.draw();
+            for (let segment of body) {
+                setTimeout(function(){
+                    segment.draw();
+                },4000);
+              
+                if(segment.x>canvas.width){
+                segment.x = segment.x - segment.x;
+            };
+            if(segment.y>canvas.height){
+                segment.y = segment.y - segment.y;
+            }
+            if(segment.x<0){
+                segment.x = canvas.width;
+            }
+            if(segment.y<0){
+                segment.y = canvas.height;
+            }
+
+            }
+
+            ctx.font = '15px Arial';
+      ctx.fillStyle = 'lime';
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'top';
+      ctx.fillText(`Score: ${score}`, 90, 30)
+      
+
+
+
+
+            requestAnimationFrame(animate);
+        }
+
+        // Set initial snake movement
+        body[0].vx = 2; // Starting to the right
+        body[0].vy = 0; // No vertical movement
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') {
+                body[0].vx = 2;
+                body[0].vy = 0;
+            } else if (e.key === 'ArrowLeft') {
+                body[0].vx = -2;
+                body[0].vy = 0;
+            } else if (e.key === 'ArrowUp') {
+                body[0].vy = -2;
+                body[0].vx = 0;
+            } else if (e.key === 'ArrowDown') {
+                body[0].vy = 2;
+                body[0].vx = 0;
+            }
+
+           
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === ' ') {
+                body[0].vx = 0;
+                body[0].vy = 0;
+            }
+        });
+
+        setTimeout(function(){
+            ctx.font = '60px Arial';
+      ctx.fillStyle = 'lime';
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'top';
+      ctx.fillText("3", canvas.width/2, canvas.height/2)
+                },1000);
+
+                setTimeout(function(){
+            ctx.font = '60px Arial';
+      ctx.fillStyle = 'lime';
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'top';
+      ctx.fillText("2", canvas.width/2, canvas.height/2)
+                },2000);
+
+                setTimeout(function(){
+            ctx.font = '60px Arial';
+      ctx.fillStyle = 'lime';
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'top';
+      ctx.fillText("1", canvas.width/2, canvas.height/2)
+                },3000);
+
+                setTimeout(function(){
+            ctx.font = '60px Arial';
+      ctx.fillStyle = 'lime';
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'top';
+      ctx.fillText("GO", canvas.width/2, canvas.height/2)
+                },3900);
+
+        animate();
+    </script>
+</body>
+</html>

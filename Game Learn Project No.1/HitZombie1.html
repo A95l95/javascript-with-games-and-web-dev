@@ -1,0 +1,206 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8'>
+  <title>Page Title</title>
+  <style>
+    body {
+      margin: 0px;
+    }
+   
+  </style>
+</head>
+<body>
+  <canvas id="myCanvas"></canvas>
+<script>
+    const canvas = document.getElementById("myCanvas");
+    canvas.width = innerWidth;
+    canvas.height = innerHeight;
+    
+    const ctx = canvas.getContext('2d');
+
+
+   
+/* const backgroundImage = new Image();
+backgroundImage.src = 'C:/Users/alaphatmugabi/Desktop/Research/download.jpg';
+
+
+backgroundImage.onload = function() {
+  const pattern = ctx.createPattern(backgroundImage, 'repeat');
+  ctx.fillStyle = pattern;
+  ctx.fillRect(0, 0, 200, 200);
+};
+ */
+
+    class Circle {
+      constructor(x, y, radius, color, vx, vy) {
+        this.x = x;
+        this.y = y;
+        this.radius = radius;
+        this.color = color;
+        this.vx = vx;
+        this.vy = vy;
+      }
+
+      draw() {
+        ctx.beginPath();
+        ctx.fillStyle = this.color;
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+        ctx.fill();
+      }
+
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+      }
+    }
+
+    const circle1 = [];
+    for (let i = 0; i < 1; i++) {
+      const x = canvas.width / 2;
+      const y = canvas.height - 100;
+      const radius =  20;
+      const color = 'gold';
+      const vx = 0;
+      const vy = 0;
+      circle1.push(new Circle(x, y, radius, color, vx, vy));
+    }
+
+    let circle2 = [];
+    addEventListener('click', (e) => {
+      for (let i = 0; i < 1; i++) {
+        const x = e.clientX;
+        const y = e.clientY;
+        const angle = Math.atan2(y - circle1[0].y, x - circle1[0].x);
+        const speed = 10;
+        const vx = Math.cos(angle) * speed;
+        const vy = Math.sin(angle) * speed; 
+        circle2.push(new Circle(circle1[0].x, circle1[0].y,3, 'gold', vx, vy));
+      }
+    })
+
+    let circle3 = [];
+    function generateCircles() {
+      for (let i = 0; i < 4; i++) {
+        let x, y;
+        const side = Math.floor(Math.random() * 4);
+        if (side === 0) {
+          // top
+          x = Math.random() * canvas.width;
+          y = -20;
+        }
+
+        const angle = Math.atan2(circle1[0].y - y, circle1[0].x - x);
+        const speed = Math.random() * 2 + 1;
+        const vx = Math.cos(angle) * speed;
+        const vy = Math.sin(angle) * speed;
+
+        circle3.push(new Circle(x, y,  Math.random()*20+10, `rgba(${Math.random() * 230}, ${Math.random() * 230}, ${Math.random() * 230})`, vx, vy));
+      }
+    }
+    setInterval(generateCircles, 2000);
+
+    let score = 0;
+    function collision(bullet, enemy) {
+      const dx = bullet.x - enemy.x;
+      const dy = bullet.y - enemy.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      const totalRadius = bullet.radius + enemy.radius;
+
+      if (distance < totalRadius) {
+        console.log("Collision detected!");
+        bullet.radius = 0;
+        enemy.radius = 0;
+        score++;
+      }
+    }
+
+    function collision1(mother, enemy) {
+      const dx = mother.x - enemy.x;
+      const dy = mother.y - enemy.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      const totalRadius = mother.radius + enemy.radius;
+
+      if (distance < totalRadius) {
+        console.log("Collision detected!");
+
+        ctx.font = '20px Arial';
+      ctx.fillStyle = 'lime';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.fillText('press here to Restart?', canvas.width/2, 100)
+
+
+        ctx.font = '30px Arial';
+      ctx.fillStyle = 'red';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.fillText('GameOver!', canvas.width/2, canvas.height/2)
+
+      enemy[i].vy = 0;
+enemy[i].vx = 0;
+
+
+
+        // Handle collision logic here
+      }
+    }
+
+
+    let animationId;
+
+let gameOver = false;
+
+    function animate() {
+
+      if (gameOver) {
+    cancelAnimationFrame(animationId);
+    return;
+  }
+
+
+      ctx.fillStyle = `rgba(0,0,0,0.4)`;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      for (let mother of circle1) {
+        mother.update();
+        mother.draw();
+        for (let enemy of circle3) {
+          collision1(mother, enemy);
+        }
+      }
+      for (let bullet of circle2) {
+        bullet.update();
+        bullet.draw();
+        for (let enemy of circle3) {
+          collision(bullet, enemy);
+        }
+      }
+      for (let enemy of circle3) {
+        enemy.update();
+        enemy.draw();
+      }
+      circle2 = circle2.filter(bullet => bullet.radius > 0);
+    
+
+
+      circle3 = circle3.filter(enemy => enemy.radius > 0);
+      ctx.font = '24px Arial';
+      ctx.fillStyle = 'lime';
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'top';
+      ctx.fillText(`Score: ${score}`, 100, 30)
+      
+
+      animationId = requestAnimationFrame(animate);
+  }
+
+    
+    animate();
+
+    </script>
+
+
+
+</body>
+</html>
